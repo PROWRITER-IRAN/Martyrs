@@ -1,18 +1,370 @@
-lorem lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
-lorem
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمایش تصادفی عکس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        #random-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: none;
+            transition: transform 0.3s ease;
+        }
+        
+        #random-image.loaded {
+            display: block;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .placeholder {
+            padding: 40px;
+            color: #aaa;
+            font-size: 1.2rem;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #4A00E0, #8E2DE2);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #new-random {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+        
+        .image-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .counter {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+        
+        .loading {
+            display: none;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .image-container {
+                min-height: 300px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-random"></i> نمایش تصادفی عکس</h1>
+            <p class="subtitle">با هر بار بارگذاری یا کلیک روی دکمه، یک عکس تصادفی از مجموعه 15 عکس نمایش داده می‌شود</p>
+        </header>
+        
+        <main>
+            <div class="image-container">
+                <div class="placeholder" id="placeholder">
+                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                    در حال انتخاب تصادفی یک عکس...
+                </div>
+                <img id="random-image" alt="تصویر تصادفی">
+            </div>
+            
+            <div class="controls">
+                <button id="new-random">
+                    <i class="fas fa-redo"></i> عکس تصادفی جدید
+                </button>
+                <button id="show-current">
+                    <i class="fas fa-info-circle"></i> نمایش اطلاعات عکس
+                </button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner loading-spinner"></i> در حال بارگذاری تصویر...
+            </div>
+            
+            <div class="image-info" id="image-info" style="display: none;">
+                <!-- اطلاعات عکس در اینجا نمایش داده می‌شود -->
+            </div>
+        </main>
+        
+        <footer>
+            <p>تعداد کل عکس‌ها: <span class="counter">15</span> | این صفحه تنها یک عکس را بارگذاری می‌کند تا سرعت لود افزایش یابد</p>
+        </footer>
+    </div>
 
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // عناصر DOM
+            const randomImage = document.getElementById('random-image');
+            const placeholder = document.getElementById('placeholder');
+            const newRandomBtn = document.getElementById('new-random');
+            const showCurrentBtn = document.getElementById('show-current');
+            const imageInfo = document.getElementById('image-info');
+            const loading = document.getElementById('loading');
+            
+            // تعداد کل عکس‌ها
+            const totalImages = 15;
+            
+            // تابع برای تولید عدد تصادفی بین 1 تا 15
+            function getRandomImageNumber() {
+                return Math.floor(Math.random() * totalImages) + 1;
+            }
+            
+            // تابع برای بارگذاری یک تصویر
+            function loadRandomImage() {
+                // مخفی کردن عکس قبلی و نمایش placeholder
+                randomImage.classList.remove('loaded');
+                placeholder.style.display = 'block';
+                imageInfo.style.display = 'none';
+                loading.classList.add('active');
+                
+                // تولید یک عدد تصادفی
+                const randomNum = getRandomImageNumber();
+                
+                // ایجاد مسیر تصویر بر اساس شماره تصادفی
+                // فرض می‌کنیم عکس‌ها در پوشه Images قرار دارند و فرمت آنها .jpg است
+                const imagePath = `Images/${randomNum}.jpg`;
+                
+                // ایجاد یک شیء Image برای پیش‌بارگذاری
+                const img = new Image();
+                
+                // وقتی عکس بارگذاری شد
+                img.onload = function() {
+                    // تنظیم src عکس اصلی
+                    randomImage.src = imagePath;
+                    randomImage.alt = `عکس شماره ${randomNum}`;
+                    
+                    // ذخیره شماره عکس فعلی در dataset
+                    randomImage.dataset.imageNumber = randomNum;
+                    
+                    // مخفی کردن placeholder و نمایش عکس با انیمیشن
+                    setTimeout(function() {
+                        placeholder.style.display = 'none';
+                        randomImage.classList.add('loaded');
+                        loading.classList.remove('active');
+                        
+                        // نمایش اطلاعات عکس
+                        updateImageInfo(randomNum);
+                    }, 300);
+                };
+                
+                // در صورت خطا در بارگذاری عکس
+                img.onerror = function() {
+                    loading.classList.remove('active');
+                    placeholder.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                        خطا در بارگذاری عکس!<br>
+                        لطفاً مطمئن شوید پوشه Images حاوی عکس‌ها در کنار این فایل قرار دارد.
+                        <div style="margin-top: 15px; font-size: 0.9rem;">
+                            عکس‌ها باید با نام‌های 1.jpg تا 15.jpg شماره‌گذاری شوند
+                        </div>
+                    `;
+                };
+                
+                // شروع بارگذاری تصویر
+                img.src = imagePath;
+            }
+            
+            // تابع برای به‌روزرسانی اطلاعات عکس
+            function updateImageInfo(imageNumber) {
+                imageInfo.innerHTML = `
+                    <h3><i class="fas fa-info-circle"></i> اطلاعات عکس فعلی</h3>
+                    <p>شماره عکس: <span class="counter">${imageNumber}</span></p>
+                    <p>مسیر فایل: <code>Images/${imageNumber}.jpg</code></p>
+                    <p>تعداد کل عکس‌های موجود: <span class="counter">${totalImages}</span></p>
+                `;
+            }
+            
+            // بارگذاری یک عکس تصادفی هنگام لود صفحه
+            loadRandomImage();
+            
+            // رویداد کلیک برای دکمه دریافت عکس تصادفی جدید
+            newRandomBtn.addEventListener('click', loadRandomImage);
+            
+            // رویداد کلیک برای نمایش اطلاعات عکس فعلی
+            showCurrentBtn.addEventListener('click', function() {
+                if (randomImage.dataset.imageNumber) {
+                    updateImageInfo(randomImage.dataset.imageNumber);
+                    imageInfo.style.display = 'block';
+                    
+                    // اسکرول به سمت اطلاعات
+                    imageInfo.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+            
+            // اضافه کردن افکت hover روی عکس
+            randomImage.addEventListener('mouseenter', function() {
+                if (this.classList.contains('loaded')) {
+                    this.style.transform = 'scale(1.03)';
+                }
+            });
+            
+            randomImage.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+            
+            // اضافه کردن قابلیت کلیک روی عکس برای دریافت عکس جدید
+            randomImage.addEventListener('click', function() {
+                if (this.classList.contains('loaded')) {
+                    loadRandomImage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
