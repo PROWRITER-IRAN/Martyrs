@@ -12,9 +12,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            /* گرادیانت ثابت بدون انیمیشن برای سرعت بیشتر */
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,113 +21,105 @@
             padding: 20px;
         }
         
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
         .container {
             width: 90vw;
             max-width: 1200px;
-            height: 85vh;
+            height: 90vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            gap: 30px;
+            gap: 20px;
         }
         
         .image-container {
             flex: 1;
             width: 100%;
             overflow: hidden;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 6px solid rgba(255, 255, 255, 0.15);
-            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 0;
+            position: relative;
         }
         
         .text-container {
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            max-height: 35vh;
-            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .text-content {
             color: #fff;
-            font-size: 1.3rem;
-            line-height: 1.8;
+            font-size: 1.2rem;
+            line-height: 1.7;
             text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 10px;
+            font-family: system-ui, -apple-system, sans-serif;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .text-content.loaded {
+            opacity: 1;
         }
         
         #random-image {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 95%;
+            max-height: 95%;
             object-fit: contain;
-            display: none;
-            transition: all 0.5s ease;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
         
         #random-image.loaded {
-            display: block;
-            animation: fadeInScale 0.8s ease forwards;
-        }
-        
-        @keyframes fadeInScale {
-            from { 
-                opacity: 0; 
-                transform: scale(0.95) rotate(-1deg); 
-            }
-            to { 
-                opacity: 1; 
-                transform: scale(1) rotate(0deg); 
-            }
+            opacity: 1;
+            transform: scale(1);
         }
         
         .placeholder {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 1.5rem;
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .text-placeholder {
-            color: rgba(255, 255, 255, 0.8);
             font-size: 1.2rem;
             text-align: center;
             padding: 20px;
+            position: absolute;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
             .container {
                 height: 95vh;
-                gap: 20px;
+                gap: 15px;
             }
             
             .text-content {
-                font-size: 1.1rem;
+                font-size: 1rem;
                 line-height: 1.6;
             }
             
-            .image-container {
-                border-width: 4px;
-            }
-            
-            .text-container {
-                padding: 20px;
-                max-height: 40vh;
+            .image-container, .text-container {
+                border-radius: 8px;
             }
         }
     </style>
@@ -137,25 +128,25 @@
     <div class="container">
         <div class="image-container">
             <div class="placeholder" id="placeholder">
-                در حال بارگذاری تصویر...
+                <div class="loading-spinner"></div>
+                در حال بارگذاری...
             </div>
-            <img id="random-image" alt="تصویر تصادفی">
+            <img id="random-image" alt="تصویر تصادفی" loading="eager">
         </div>
         
         <div class="text-container">
             <div class="text-content" id="text-content">
-                <div class="text-placeholder">در حال بارگذاری متن...</div>
+                در حال بارگذاری متن...
             </div>
         </div>
     </div>
 
     <script>
+        // کد بهینه‌شده - سریع‌تر
         document.addEventListener('DOMContentLoaded', function() {
             const randomImage = document.getElementById('random-image');
             const placeholder = document.getElementById('placeholder');
             const textContent = document.getElementById('text-content');
-            
-            const totalImages = 15;
             
             const texts = [
                 "من رفتم که تو بمونی... ولی حالا که موندم بین خاک، فقط از خدا می‌پرسم: موندنِ بی‌مقصد به چه دردش می‌خوره؟",
@@ -175,55 +166,48 @@
                 "رفتم که بگم زندگی یعنی “وایستادن”… شما فقط نذارین اون ایستادگی رو خاکِ فراموشی بپوشونه."
             ];
             
-            function getRandomImageNumber() {
-                return Math.floor(Math.random() * totalImages) + 1;
-            }
-            
-            function getImageExtension(imageNumber) {
-                if (imageNumber === 5 || imageNumber === 6) {
-                    return 'jpeg';
-                }
-                return 'jpg';
-            }
-            
-            function getRandomText(imageNumber) {
-                return texts[imageNumber - 1];
-            }
-            
+            // فوراً محتوا رو لود کن (بدون تأخیر)
             function loadContent() {
-                randomImage.classList.remove('loaded');
-                placeholder.style.display = 'flex';
-                textContent.innerHTML = '<div class="text-placeholder">در حال بارگذاری متن...</div>';
-                
-                const randomNum = getRandomImageNumber();
-                const extension = getImageExtension(randomNum);
+                const randomNum = Math.floor(Math.random() * 15) + 1;
+                const extension = (randomNum === 5 || randomNum === 6) ? 'jpeg' : 'jpg';
                 const imagePath = `Images/${randomNum}.${extension}`;
-                const selectedText = getRandomText(randomNum);
                 
+                // متن رو فوراً نمایش بده
+                textContent.textContent = texts[randomNum - 1];
+                textContent.classList.add('loaded');
+                
+                // عکس رو لود کن
                 const img = new Image();
                 
                 img.onload = function() {
                     randomImage.src = imagePath;
-                    randomImage.dataset.imageNumber = randomNum;
+                    randomImage.alt = `عکس شماره ${randomNum}`;
                     
-                    setTimeout(function() {
-                        placeholder.style.display = 'none';
-                        randomImage.classList.add('loaded');
-                        textContent.innerHTML = selectedText;
-                    }, 300);
+                    // تأخیر کم‌تر
+                    setTimeout(() => {
+                        placeholder.style.opacity = '0';
+                        setTimeout(() => {
+                            placeholder.style.display = 'none';
+                            randomImage.classList.add('loaded');
+                        }, 100);
+                    }, 50);
                 };
                 
                 img.onerror = function() {
                     placeholder.innerHTML = 'خطا در بارگذاری عکس';
-                    textContent.innerHTML = selectedText;
+                    textContent.textContent = texts[randomNum - 1];
                 };
                 
+                // فوراً شروع به لود کن
                 img.src = imagePath;
             }
             
+            // بلافاصله بعد از لود صفحه شروع کن
             loadContent();
+            
+            // برای دیباگ - کنسول لاگ بزن
+            console.log('صفحه لود شد - فقط یک عکس لود می‌شود');
         });
     </script>
 </body>
 </html>
-
