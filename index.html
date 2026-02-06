@@ -28,19 +28,49 @@
             100% { background-position: 0% 50%; }
         }
         
-        .image-container {
-            position: relative;
+        .container {
             width: 90vw;
             max-width: 1200px;
-            height: 80vh;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        
+        .image-container {
+            flex: 1;
+            width: 100%;
             overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
-            border: 8px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 6px solid rgba(255, 255, 255, 0.15);
             background-color: rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 0;
+        }
+        
+        .text-container {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            max-height: 35vh;
+            overflow-y: auto;
+        }
+        
+        .text-content {
+            color: #fff;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 10px;
         }
         
         #random-image {
@@ -74,28 +104,76 @@
             padding: 40px;
         }
         
+        .text-placeholder {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 20px;
+        }
+        
         @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+                gap: 20px;
+            }
+            
+            .text-content {
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+            
             .image-container {
-                height: 70vh;
                 border-width: 4px;
+            }
+            
+            .text-container {
+                padding: 20px;
+                max-height: 40vh;
             }
         }
     </style>
 </head>
 <body>
-    <div class="image-container">
-        <div class="placeholder" id="placeholder">
-            در حال بارگذاری تصویر...
+    <div class="container">
+        <div class="image-container">
+            <div class="placeholder" id="placeholder">
+                در حال بارگذاری تصویر...
+            </div>
+            <img id="random-image" alt="تصویر تصادفی">
         </div>
-        <img id="random-image" alt="تصویر تصادفی">
+        
+        <div class="text-container">
+            <div class="text-content" id="text-content">
+                <div class="text-placeholder">در حال بارگذاری متن...</div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const randomImage = document.getElementById('random-image');
             const placeholder = document.getElementById('placeholder');
+            const textContent = document.getElementById('text-content');
             
             const totalImages = 15;
+            
+            const texts = [
+                "من رفتم که تو بمونی... ولی حالا که موندم بین خاک، فقط از خدا می‌پرسم: موندنِ بی‌مقصد به چه دردش می‌خوره؟",
+                "وقتی گلوله خورد، درد نداشت... دردِ واقعی رو حالا دارم؛ وقتی می‌بینم دنیات شده همه چیزت، جز خدات.",
+                "ما به خاطر شما رفتیم، نه برای اینکه فقط یادمون کنین، برای اینکه ادامه‌مون بدین...",
+                "شاید یادم رفته باشی، ولی من هنوز یاد نگاهِ آخرِ مردمِ کشورم رو یادمه — پر از نگرانی، پر از امید.",
+                "من خاک شدم، تو سبز بمون... ولی لطفاً یادم کن، حتی با یه دل‌شکسته “فاتحه”.",
+                "روزی که رفتم، خندیدم نه چون نمی‌ترسیدم، خندیدم چون می‌دونستم یکی باید تو سختی‌ها بایسته، تا شما راحت نفس بکشین.",
+                "هر قطره خون من، بوی وطن می‌داد، بوی مادرم، بوی ایمان... تو فقط نذار این بو گم بشه بین دودِ دنیا.",
+                "توی لحظه‌ی آخر، چیزی خواستم؟ نه، فقط دعا کردم که شما “کمی مرد باشید برای خدا”، نه برای دنیا.",
+                "من رفتم، چون فهمیده بودم مرگ، ترسناک نیست... ترسناک‌تر از اون، زندگی بدون هدفه.",
+                "خوابم آرومه، اگه شما بیدار بمونین... اگه یادتون نره راهی که با خون باز کردیم، راه زندگیه نه شعار.",
+                "به مادرم بگین غصه نخور، من هنوز می‌خندم، اینجا بین فرشته‌ها، وقتی اسم وطن میاد.",
+                "پاشو رفیق، دنیا منتظره غیرتِ تو. من کارمُ کردم، نوبت توئه که جلوی بی‌خیالی وایستی.",
+                "هر وقت می‌گی “کاش منم اون‌جا بودم”، بدون که اون‌جا بودن، فقط لباس خاکی نبود... دلِ خالص می‌خواست، که هنوزم خدا منتظرشه.",
+                "من از بی‌نشونی نمی‌ترسم، از بی‌مهری می‌ترسم... وقتی می‌بینم اسممون شده فقط یه تیتر بی‌احساس تو شبکه‌ها.",
+                "رفتم که بگم زندگی یعنی “وایستادن”… شما فقط نذارین اون ایستادگی رو خاکِ فراموشی بپوشونه."
+            ];
             
             function getRandomImageNumber() {
                 return Math.floor(Math.random() * totalImages) + 1;
@@ -108,13 +186,19 @@
                 return 'jpg';
             }
             
-            function loadRandomImage() {
+            function getRandomText(imageNumber) {
+                return texts[imageNumber - 1];
+            }
+            
+            function loadContent() {
                 randomImage.classList.remove('loaded');
                 placeholder.style.display = 'flex';
+                textContent.innerHTML = '<div class="text-placeholder">در حال بارگذاری متن...</div>';
                 
                 const randomNum = getRandomImageNumber();
                 const extension = getImageExtension(randomNum);
                 const imagePath = `Images/${randomNum}.${extension}`;
+                const selectedText = getRandomText(randomNum);
                 
                 const img = new Image();
                 
@@ -125,17 +209,19 @@
                     setTimeout(function() {
                         placeholder.style.display = 'none';
                         randomImage.classList.add('loaded');
+                        textContent.innerHTML = selectedText;
                     }, 300);
                 };
                 
                 img.onerror = function() {
                     placeholder.innerHTML = 'خطا در بارگذاری عکس';
+                    textContent.innerHTML = selectedText;
                 };
                 
                 img.src = imagePath;
             }
             
-            loadRandomImage();
+            loadContent();
         });
     </script>
 </body>
